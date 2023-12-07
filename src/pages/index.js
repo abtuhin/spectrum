@@ -1,19 +1,9 @@
-import SensorChart from '@/components/SensorChart';
+import FlexChartContainer from '@/components/FlexContainer';
 import useSensors from '@/hooks/useSensors';
 import React, { useEffect, useState } from 'react';
 
 const Home = () => {
-  const initialData = [
-    // {
-    //   timestamp: new Date().toLocaleTimeString(),
-    //   velocity: 0,
-    //   altitude: 0,
-    //   temperature: 0,
-    //   isAscending: false,
-    //   isActionRequired: false,
-    //   statusMessage: ""
-    // }
-  ]
+  const initialData = [];
   const [sensorData, setSensorData] = useState(initialData);
 
   const { _, isLoading, error, refetch } = useSensors({
@@ -31,12 +21,32 @@ const Home = () => {
         {isLoading && <p>Loading...</p>}
         {error && <p>Error: {error.message}</p>}
         {sensorData && (
-          <>
-            <SensorChart data={sensorData} />
-          </>
+          <FlexChartContainer
+            data={sensorData}
+          />
         )}
-        <button onClick={() => refetch()}>Refresh sensor data</button>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          <div
+            onClick={() => refetch()} 
+            style={{
+              display: 'flex', 
+              width: 200, 
+              background: '#FFD700',
+              padding: '1%',
+              justifyContent: 'center',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+              cursor: 'pointer',
+            }}
+          >
+            Refresh Sensor
+          </div>
+        </div>
     </div>
+    
   );
 };
 
