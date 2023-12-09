@@ -1,48 +1,38 @@
-import React, { useEffect, useState } from 'react';
-import io from 'socket.io-client';
+import React, { useEffect } from 'react';
 
-const Home = () => {
-  const [socket, setSocket] = useState(null);
-  const [message, setMessage] = useState('');
-  const [receivedMessages, setReceivedMessages] = useState([]);
+const socketString = "wss://webfrontendassignment-isaraerospace.azurewebsites.net/api/SpectrumWS";
+
+const SocketComponent = ({ streamCallback = () => {}, handleActionCallback = () => {} }) => {
 
   useEffect(() => {
-    // Connect to the WebSocket server
-    const socketInstance = io('wss://webfrontendassignment-isaraerospace.azurewebsites.net/api/SpectrumWS');
+    const newSocket = new WebSocket(socketString);
 
-    // Set up event listeners
-    socketInstance.on('connect', () => {
-      console.log('Connected to WebSocket server');
+    newSocket.addEventListener('open', (event) => {
+      console.log('socket opened:', event);
     });
 
-    socketInstance.on('message', (newMessage) => {
-      setReceivedMessages((prevMessages) => [...prevMessages, newMessage]);
+    newSocket.addEventListener('error', (event) => {
+      console.error('socket error:', event);
     });
 
-    // Save the socket instance to state
-    setSocket(socketInstance);
+    newSocket.addEventListener('close', (event) => {
+      console.log('WebSocket connection closed:', event);
+    });
 
-    // Clean up on component unmount
-    return () => {
-      if (socketInstance) {
-        socketInstance.disconnect();
+    newSocket.addEventListener('message', (event) => {
+      const data = JSON.parse(event.data);
+      if (data.IsActionRequired) {
+        handleActionCallback(data.StatusMessage);
+      } else {
+        streamCallback(data);
       }
+    });
+    return () => {
+      newSocket.close();
     };
   }, []);
 
-  return (
-    <div>
-      <h1>WebSocket Example</h1>
-      <div>
-        <ul>
-          {receivedMessages.map((msg, index) => (
-            <li key={index}>{msg}</li>
-          ))}
-        </ul>
-      </div>
-      
-    </div>
-  );
 };
 
-export default Home;
+export default SocketComponent;
+
