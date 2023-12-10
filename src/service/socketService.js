@@ -11,10 +11,9 @@ class SocketService {
 
     this.socket.addEventListener('message', (event) => {
       const data = JSON.parse(event.data);
+      this.streamCallback(data);
       if (data.IsActionRequired) {
         this.handleActionCallback(data.StatusMessage);
-      } else {
-        this.streamCallback(data);
       }
     });
   }
