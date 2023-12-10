@@ -1,11 +1,9 @@
-import axios from "axios";
+import dataService from "@/service/dataService";
 import { useQuery } from "react-query";
 
 export default function useSensors({ onSuccess }) {
   return useQuery("sensors", async () => {
-    const { data } = await axios.get(
-      "https://webfrontendassignment-isaraerospace.azurewebsites.net/api/SpectrumStatus"
-    );
+    const { data } = await dataService.getSensorData()
     return data;
   },{
     onSuccess: (data) => {

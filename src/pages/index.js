@@ -12,8 +12,6 @@ const Home = () => {
   const [sensorData, setSensorData] = useState(initialData);
   const [socketData, setSocketData] = useState(initialData);
   const [action, setAction] = useState(false);
-
-  
   const { _, isLoading, error, refetch } = useSensors({
     onSuccess: (data) => {
       const newData = {
@@ -23,9 +21,12 @@ const Home = () => {
       setSensorData([...sensorData, newData]);
     },
   });
-
   const { refetch: ActOnSpectrum } = useSpectrumAction();
 
+  /**
+   * Callback to get sensor data from socket
+   * updating state array with new data from the socket
+   */
   const streamCallback = (data) => {
     const newData = {
       velocity: data.Velocity,
@@ -36,19 +37,33 @@ const Home = () => {
       statusMessage: data.StatusMessage,
       timestamp: new Date().toLocaleTimeString()
     }
-
     setSocketData(prevSocketData => [...prevSocketData, newData]);
   }
 
+  /**
+   * Callback when action is required
+   * showing status of the sensor in a toast
+   * setting trigger action button visible
+   */
   const handleActionCallback = (status) => {
     toast(status);
     setAction(true);
   };
 
+  /**
+   * trigger action to call ActOnSpectrum on api
+   * setting trigger action button invisible
+   */
+  const triggerAction = () => {
+    ActOnSpectrum();
+    setAction(false);
+  }
+
   return (
     <div>
+        <h1 style={{ textAlign: 'center' }}>Spectrum</h1>
         <ToastContainer />
-        <h4>Task 1</h4>
+        <h4 style={{ textAlign: 'center' }}>Task 1</h4>
         {isLoading && <p>Loading...</p>}
         {error && <p>Error: {error.message}</p>}
         {sensorData && (
@@ -57,7 +72,7 @@ const Home = () => {
           />
         )}
         <Button name={"Refetch Data"} onClick={() => refetch()}/>
-        <h4>Task 2</h4>
+        <h4 style={{ textAlign: 'center' }}>Task 2</h4>
         <WebSocket
           streamCallback={streamCallback}
           handleActionCallback={handleActionCallback}
@@ -66,12 +81,8 @@ const Home = () => {
           data={socketData}
         />
         { action &&
-          <Button name={"Trigger Action"} onClick={() => {
-          ActOnSpectrum();
-          setAction(false);
-        }}/>
+          <Button name={"Trigger Action"} onClick={triggerAction}/>
         }
-        
     </div>
     
   );
