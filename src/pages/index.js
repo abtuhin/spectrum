@@ -1,10 +1,10 @@
 import Button from '@/components/Button';
 import FlexChartContainer from '@/components/FlexContainer';
-import WebSocket from '@/components/Websocket';
 import useSensors from '@/hooks/useSensors';
 import useSpectrumAction from '@/hooks/useSpectrumAction';
 import React, { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
+import SocketService from '@/service/socketService';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Home = () => {
@@ -14,21 +14,30 @@ const Home = () => {
   const [action, setAction] = useState(false);
   const { _, isLoading, error, refetch } = useSensors({
     onSuccess: (data) => {
-      const newData = {
+      const spectrumData = {
         ...data,
         timestamp: new Date().toLocaleTimeString()
       }
-      setSensorData([...sensorData, newData]);
+      setSensorData([...sensorData, spectrumData]);
     },
   });
   const { refetch: ActOnSpectrum } = useSpectrumAction();
+
+  useEffect(() => {
+    const socketService = new SocketService(streamCallback, handleActionCallback);
+    socketService.connect();
+    return () => {
+      socketService.close();
+    };
+  }, []);
+
 
   /**
    * Callback to get sensor data from socket
    * updating state array with new data from the socket
    */
   const streamCallback = (data) => {
-    const newData = {
+    const spectrumData = {
       velocity: data.Velocity,
       altitude: data.Altitude,
       temperature: data.Temperature,
@@ -37,7 +46,7 @@ const Home = () => {
       statusMessage: data.StatusMessage,
       timestamp: new Date().toLocaleTimeString()
     }
-    setSocketData(prevSocketData => [...prevSocketData, newData]);
+    setSocketData(prevSocketData => [...prevSocketData, spectrumData]);
   }
 
   /**
@@ -73,10 +82,6 @@ const Home = () => {
         )}
         <Button name={"Refetch Data"} onClick={() => refetch()}/>
         <h4 style={{ textAlign: 'center' }}>Task 2</h4>
-        <WebSocket
-          streamCallback={streamCallback}
-          handleActionCallback={handleActionCallback}
-        />
         <FlexChartContainer
           data={socketData}
         />
