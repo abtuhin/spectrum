@@ -6,9 +6,17 @@ Spectrum’s sensor system during its maiden flight.
 ## Installing 
 
 Run ```npm install``` to installing dependency
+Run ```npm run test``` for testing locally
 Run ```npm run dev``` to start the development server
 
 Open [http://localhost:4000](http://localhost:4000) with your browser to see the result.
+
+## TECHNOLOGY
+- REACT 
+- NEXTJS
+- REACT QUERY
+- JEST
+- RECHARTS
 
 ## Possible Improvements in API
 
