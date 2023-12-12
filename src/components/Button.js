@@ -1,4 +1,4 @@
-export default function ({ name, onClick = () => {} }) {
+const Button = ({ name, onClick = () => {} }) => {
   return (
     <div style={{
       display: 'flex',
@@ -22,3 +22,5 @@ export default function ({ name, onClick = () => {} }) {
     </div>
   )
 }
+
+export default Button;

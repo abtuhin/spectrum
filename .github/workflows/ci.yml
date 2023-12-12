@@ -16,3 +16,9 @@ jobs:
           ls ${{ github.workspace }}
       - run: npm install
       - run: npm run test
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build application
+        uses: actions/checkout@v4
+      - run: npm run build
